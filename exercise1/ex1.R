@@ -9,7 +9,6 @@ library(dplyr)
 library(tidyr)
 install.packages("fmsb")
 library(fmsb)
-# setwd("C:/Users/swkra/OneDrive - aueb.gr/Uni/7th-semester/Statmethods/exercise1")
 
 df <- read_excel("project cluster.xlsx")
 set.seed(0)
