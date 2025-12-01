@@ -55,17 +55,12 @@ df_cluster$market.segment.type <- as.numeric(recode(df_cluster$market.segment.ty
 
 head(df_cluster)
 
-# Custom scale function
-standard_scale <- function(x) {
-  (x - mean(x)) / sqrt(mean((x - mean(x))^2))  
-}
-
 # Select ONLY numeric columns
 numeric_cols <- sapply(df, is.numeric)
 df_numeric <- df[, numeric_cols]
 
-# Apply Python-style scaling
-df_scaled <- as.data.frame(apply(df_numeric, 2, standard_scale))
+#Scale numeric columns
+df_scaled=scale(df_numeric)
 
 # Elbow and Silhouette analysis function to find best k
 elbow_silhouette_analysis <- function(df_scaled, max_k = 10) {
