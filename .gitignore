@@ -4,3 +4,8 @@
 .Rproj
 report.pdf
 ex1.ipynb
+test.txt
+test.py
+.venv
+.vscode
+ex2.ipynb

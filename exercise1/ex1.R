@@ -1,12 +1,11 @@
 # Imports
 library(readxl)
 library(dplyr)
+library(tidyr)
 library(cluster)
 library(factoextra)
 library(ggplot2)
 library(gridExtra)
-library(dplyr)
-library(tidyr)
 install.packages("fmsb")
 library(fmsb)
 
@@ -106,10 +105,6 @@ elbow_silhouette_analysis <- function(df_scaled, max_k = 10) {
 # Run
 best_k <- elbow_silhouette_analysis(df_scaled)
 
-# KMeans Clustering
-kmeans_res <- kmeans(df_scaled, centers = best_k, nstart = 25)
-kmeans_labels <- kmeans_res$cluster
-
 # Interpret clusters
 interpret_clusters <- function(df_vars_only, labels, verbose = TRUE) {
   df_temp <- df_vars_only
@@ -161,6 +156,10 @@ cancellation_percentage <- function(df_original, labels, cluster_name) {
   return(summary)
 }
 
+# KMeans Clustering
+kmeans_res <- kmeans(df_scaled, centers = best_k, nstart = 25)
+kmeans_labels <- kmeans_res$cluster
+
 # K Means interpretation and cancellation percentage
 centers_kmeans <- interpret_clusters(df_cluster, kmeans_labels)
 cancel_kmeans <- cancellation_percentage(df_original, kmeans_labels, "cluster_kmeans")
@@ -182,7 +181,7 @@ df_summary <- df_cluster %>%
    group_by(cluster_kmeans) %>%
    summarise(
      car_parking = mean(car.parking.space),
-    lead_time = mean(lead.time),
+     lead_time = mean(lead.time),
      market_segment = mean(market.segment.type),
      avg_price = mean(average.price),
      persons = mean(persons),
