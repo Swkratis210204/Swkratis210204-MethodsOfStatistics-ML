@@ -9,8 +9,6 @@ library(pROC)
 
 #----------------------------------------------------------------------------------------------
 
-setwd("C:/Users/swkra/OneDrive - aueb.gr/Uni/7th-semester/Statmethods/exercises/exercise2")
-
 df <- read_csv("heart.csv")
 head(df)
 
@@ -76,6 +74,7 @@ for (col in num_cols) {
 
 #----------------------------------------------------------------------------------------------
 
+#Display people with and without heart disease
 heart_dis_count <- sum(y$HeartDisease == 1)
 no_heart_dis_count <- sum(y$HeartDisease == 0)
 
@@ -92,6 +91,7 @@ text(x = bp, y = count, labels = count, pos = 3, cex = 1.2)
 
 #----------------------------------------------------------------------------------------------
 
+#Plot nummeric attributes
 X_hd <- X[y$HeartDisease == 1, ]
 X_no_hd <- X[y$HeartDisease == 0, ]
 
@@ -140,6 +140,7 @@ for (i in seq_along(num_cols)) {
 
 #----------------------------------------------------------------------------------------------
 
+# Plot categorical attributes
 for (col in cat_cols) {
   cat("\n=== ", col, " ===\n")
   print(round(prop.table(table(df$HeartDisease, df[[col]]), 1) * 100, 3))
@@ -172,6 +173,7 @@ for (i in seq_along(cat_cols)) {
 }
 
 #----------------------------------------------------------------------------------------------
+#Plot correlatiosn between attributes
 
 plot_correlation_heatmap <- function(data, columns, title) {
   corr_matrix <- round(cor(data[, columns], use = "complete.obs"), 2)
@@ -187,16 +189,20 @@ plot_correlation_heatmap <- function(data, columns, title) {
           add.expr = text(row(corr_matrix), col(corr_matrix), labels = corr_matrix))
 }
 
+# All data
 plot_correlation_heatmap(df, c(num_cols, "HeartDisease"), "Correlation Heatmap (All Data)")
 
+# Heart Disease=1
 df_hd <- df[df$HeartDisease == 1, ]
 plot_correlation_heatmap(df_hd, num_cols, "Correlation Heatmap (Heart Disease = 1)")
 
+# Heart Disease=0
 df_no <- df[df$HeartDisease == 0, ]
 plot_correlation_heatmap(df_no, num_cols, "Correlation Heatmap (Heart Disease = 0)")
 
 #----------------------------------------------------------------------------------------------
 
+#Preprocessing class, it scales data and creates training/test datasets
 DataPreprocessor <- setRefClass(
   "DataPreprocessor",
   fields = list(
@@ -265,6 +271,7 @@ y_test <- result[[4]]
 
 #----------------------------------------------------------------------------------------------
 
+#Evaluator class, takes model as input along with the X and y, trains teh model, produces results and plots the confusion matrix along AUC
 ModelEvaluator <- setRefClass(
   "ModelEvaluator",
   fields = list(
@@ -350,12 +357,14 @@ ModelEvaluator <- setRefClass(
 )
 #---------------------------------------------------------------------------------------------
 
+#Naive bayes
 nb_model <- e1071::naiveBayes(X_train, as.factor(y_train))
 eval_nb <- ModelEvaluator$new(X_train, y_train, X_test, y_test, labels = c("No HD", "HD"))
 eval_nb$run_full_pipeline(nb_model)
 
 #----------------------------------------------------------------------------------------------
 
+#Random forest
 rf_model <- randomForest::randomForest(
   x = X_train,
   y = as.factor(y_train),
@@ -371,17 +380,18 @@ eval_rf$run_full_pipeline(rf_model)
 
 #----------------------------------------------------------------------------------------------
 
+#xGBoost
 xgb_model <- xgboost::xgboost(
-  data = as.matrix(X_train),
-  label = y_train,
-  nrounds = 300,
-  max_depth = 4,
-  eta = 0.05,
-  subsample = 0.9,
-  colsample_bytree = 0.9,
-  objective = "binary:logistic",
-  eval_metric = "logloss",
-  verbose = 0
+    x = as.matrix(X_train),
+    y = as.factor(y_train),  # Change this to a factor
+    nrounds = 300,
+    max_depth = 4,
+    learning_rate = 0.05,
+    subsample = 0.9,
+    colsample_bytree = 0.9,
+    objective = "binary:logistic",
+    eval_metric = "logloss",
+    verbosity = 0
 )
 
 eval_xgb <- ModelEvaluator$new(X_train, y_train, X_test, y_test, labels = c("No HD", "HD"))
