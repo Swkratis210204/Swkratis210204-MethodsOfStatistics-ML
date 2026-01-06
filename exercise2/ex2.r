@@ -381,17 +381,13 @@ eval_rf$run_full_pipeline(rf_model)
 #----------------------------------------------------------------------------------------------
 
 #xGBoost
+dtrain <- xgboost::xgb.DMatrix(data = as.matrix(X_train), label = y_train)
+
 xgb_model <- xgboost::xgboost(
-    x = as.matrix(X_train),
-    y = as.factor(y_train),  # Change this to a factor
-    nrounds = 300,
-    max_depth = 4,
-    learning_rate = 0.05,
-    subsample = 0.9,
-    colsample_bytree = 0.9,
+    data = dtrain,
+    nrounds = 100,
     objective = "binary:logistic",
-    eval_metric = "logloss",
-    verbosity = 0
+    verbose = 0
 )
 
 eval_xgb <- ModelEvaluator$new(X_train, y_train, X_test, y_test, labels = c("No HD", "HD"))
